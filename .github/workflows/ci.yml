@@ -46,7 +46,7 @@ jobs:
       - name: Run Pytest
         run: |
           cd stacks/02-python-fastapi
-          python -m pytest tests/test_api.py
+          PYTHONPATH=. python -m pytest -v tests/test_api.py
       - name: Run server & smoke test
         run: |
           cd stacks/02-python-fastapi

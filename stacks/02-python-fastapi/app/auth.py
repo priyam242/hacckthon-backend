@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
 import bcrypt
+import jwt
+from jwt.exceptions import PyJWTError as JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
