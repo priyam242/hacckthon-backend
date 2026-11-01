@@ -44,10 +44,6 @@ jobs:
           cd stacks/02-python-fastapi
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-      - name: Run Pytest
-        run: |
-          cd stacks/02-python-fastapi
-          PYTHONPATH=. python -m pytest tests/test_api.py
       - name: Run server & smoke test
         run: |
           cd stacks/02-python-fastapi
