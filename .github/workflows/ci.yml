@@ -22,8 +22,9 @@ jobs:
       - name: Run server & smoke test
         run: |
           cd stacks/01-nodejs-express
-          node src/server.js &
+          node src/server.js > node.log 2>&1 &
           sleep 3
+          cat node.log
           node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5000
 
   test-python:
@@ -43,13 +44,14 @@ jobs:
           cd stacks/02-python-fastapi
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-      - name: Run server & smoke test
-        run: |
-          cd stacks/02-python-fastapi
-          python -m uvicorn app.main:app --host 127.0.0.1 --port 5001 &
-          sleep 4
-          node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5001
       - name: Run Pytest
         run: |
           cd stacks/02-python-fastapi
           PYTHONPATH=. python -m pytest tests/test_api.py
+      - name: Run server & smoke test
+        run: |
+          cd stacks/02-python-fastapi
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 5000 > uvicorn.log 2>&1 &
+          sleep 4
+          cat uvicorn.log
+          node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5000
