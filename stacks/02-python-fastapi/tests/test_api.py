@@ -1,6 +1,14 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
 from app.main import app
+from app.database import engine, Base
+
+
+@pytest.fixture(autouse=True)
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
 
 @pytest.mark.asyncio
@@ -59,4 +67,3 @@ async def test_auth_and_protected_flow():
         )
         assert ai_res.status_code == 200
         assert "response" in ai_res.json()
-
