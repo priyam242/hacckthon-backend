@@ -1,6 +1,24 @@
-# Environment variables
+# Environment & Secrets
 .env
+*.env
 *.env.local
+*.env.*.local
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / JS / TS
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.cache/
 
 # Python
 __pycache__/
@@ -8,31 +26,78 @@ __pycache__/
 *$py.class
 *.db
 *.sqlite3
+*.sqlite
 .pytest_cache/
+.coverage
+htmlcov/
 venv/
 .venv/
+env/
+ENV/
 
-# Node
-node_modules/
-dist/
-npm-debug.log*
-
-# Java / Spring Boot
-target/
+# Java / Spring Boot / Kotlin
 *.class
+target/
+.mvn/wrapper/maven-wrapper.jar
 *.jar
-.idea/
-*.iml
+*.war
+*.ear
+.gradle/
+build/
 
-# .NET / C#
+# C# / .NET
 bin/
 obj/
 *.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# PHP / Laravel
+/vendor/
+/storage/*.key
+/storage/oauth-*.key
+/storage/oauth-*.pub
+
+# Go
+/bin/
+/pkg/
+*.exe
+
+# Ruby / Rails
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/test/tmp/
+/test/version_tmp/
+/tmp/
 
 # Rust
-target/
+/target/
 Cargo.lock
 
-# OS
+# Elixir
+/_build/
+/cover/
+/deps/
+/doc/
+/.fetch
+erl_crash.dump
+*.ez
+
+# Runtime uploads
+uploads/
+*/uploads/*
+shared/frontend-demo/uploads/
+
+# IDE & OS
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

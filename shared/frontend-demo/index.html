@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend Arsenal — Universal Demo Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <header class="border-b border-slate-700 pb-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-sky-400">⚡ Backend Arsenal Demo Console</h1>
+        <p class="text-slate-400 text-sm">Universal interactive test harness for all 10 backend stacks</p>
+      </div>
+      <div id="healthBadge" class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded text-xs font-mono">Checking...</div>
+    </header>
+
+    <!-- Controls -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-slate-800 p-4 rounded border border-slate-700 space-y-3">
+        <h2 class="font-semibold text-slate-200">1. Authentication</h2>
+        <input id="email" type="email" value="admin@demo.com" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm">
+        <input id="password" type="password" value="Admin@123" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm">
+        <div class="flex gap-2">
+          <button onclick="login()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white rounded py-2 text-sm font-medium">Login</button>
+          <button onclick="checkHealth()" class="px-4 bg-slate-700 hover:bg-slate-600 rounded text-sm">Health</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 p-4 rounded border border-slate-700 space-y-3">
+        <h2 class="font-semibold text-slate-200">2. AI Integration</h2>
+        <textarea id="aiPrompt" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm" placeholder="Ask AI anything...">Generate high-impact pitch tagline for hackathon project</textarea>
+        <button onclick="generateAi()" class="w-full bg-violet-600 hover:bg-violet-500 text-white rounded py-2 text-sm font-medium">Trigger AI Endpoint</button>
+      </div>
+    </div>
+
+    <!-- Output Console -->
+    <div class="bg-slate-800 p-4 rounded border border-slate-700">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-mono text-slate-400">Response Payload</span>
+        <button onclick="clearConsole()" class="text-xs text-slate-500 hover:text-slate-300">Clear</button>
+      </div>
+      <pre id="output" class="bg-slate-950 p-4 rounded font-mono text-xs overflow-auto max-h-96 text-emerald-400">Ready. Click "Health" or "Login" to begin.</pre>
+    </div>
+  </div>
+
+  <script>
+    let token = "";
+    const baseUrl = "http://localhost:5000/api";
+
+    async function req(endpoint, opts = {}) {
+      const headers = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+      try {
+        const res = await fetch(`${baseUrl}${endpoint}`, { ...opts, headers });
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+        return data;
+      } catch (err) {
+        document.getElementById("output").textContent = "Request Failed: " + err.message;
+      }
+    }
+
+    async function checkHealth() {
+      const data = await req("/health");
+      const badge = document.getElementById("healthBadge");
+      if (data && (data.success || data.status === "healthy")) {
+        badge.textContent = "ONLINE 200 OK";
+        badge.className = "px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded text-xs font-mono";
+      } else {
+        badge.textContent = "OFFLINE";
+        badge.className = "px-3 py-1 bg-rose-500/20 text-rose-300 rounded text-xs font-mono";
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const data = await req("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password, usernameOrEmail: email })
+      });
+      if (data?.data?.accessToken || data?.access_token) {
+        token = data.data?.accessToken || data.access_token;
+        alert("Logged in successfully! Token stored in session.");
+      }
+    }
+
+    async function generateAi() {
+      const prompt = document.getElementById("aiPrompt").value;
+      await req("/ai/generate", {
+        method: "POST",
+        body: JSON.stringify({ prompt })
+      });
+    }
+
+    function clearConsole() {
+      document.getElementById("output").textContent = "";
+    }
+
+    checkHealth();
+  </script>
+</body>
+</html>

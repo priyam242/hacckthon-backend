@@ -1,0 +1,125 @@
+openapi: 3.1.0
+info:
+  title: Backend Arsenal Universal API
+  version: 1.0.0
+  description: High-impact, universal API specification conforming to all 10 Backend Arsenal stacks.
+servers:
+  - url: http://localhost:5000/api
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: System health and component status
+      responses:
+        '200':
+          description: System operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      status: { type: string, example: "healthy" }
+                      uptime: { type: number }
+                      timestamp: { type: string }
+
+  /auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        '201':
+          description: User registered successfully
+
+  /auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Authentication successful
+        '401':
+          description: Invalid credentials
+
+  /items:
+    get:
+      summary: List items with pagination, filter, and search
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated item list
+    post:
+      summary: Create item (Manager or Admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, price, categoryId]
+              properties:
+                title: { type: string }
+                description: { type: string }
+                price: { type: integer, description: "Minor units (paise)" }
+                categoryId: { type: string }
+      responses:
+        '201':
+          description: Item created
+
+  /ai/generate:
+    post:
+      summary: AI content generation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string }
+      responses:
+        '200':
+          description: AI generated response
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

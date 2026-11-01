@@ -1,0 +1,123 @@
+{
+  "users": [
+    {
+      "id": "u0000000-0000-0000-0000-000000000001",
+      "name": "Arjun Sharma",
+      "email": "admin@demo.com",
+      "password": "Admin@123",
+      "role": "admin",
+      "isActive": true
+    },
+    {
+      "id": "u0000000-0000-0000-0000-000000000002",
+      "name": "Priya Patel",
+      "email": "manager@demo.com",
+      "password": "Manager@123",
+      "role": "manager",
+      "isActive": true
+    },
+    {
+      "id": "u0000000-0000-0000-0000-000000000003",
+      "name": "Rohan Gupta",
+      "email": "rohan@demo.com",
+      "password": "User@123",
+      "role": "user",
+      "isActive": true
+    },
+    {
+      "id": "u0000000-0000-0000-0000-000000000004",
+      "name": "Ananya Iyer",
+      "email": "ananya@demo.com",
+      "password": "User@123",
+      "role": "user",
+      "isActive": true
+    },
+    {
+      "id": "u0000000-0000-0000-0000-000000000005",
+      "name": "Vikram Singh",
+      "email": "vikram@demo.com",
+      "password": "User@123",
+      "role": "user",
+      "isActive": true
+    },
+    {
+      "id": "u0000000-0000-0000-0000-000000000006",
+      "name": "Sneha Reddy",
+      "email": "sneha@demo.com",
+      "password": "User@123",
+      "role": "user",
+      "isActive": true
+    }
+  ],
+  "categories": [
+    { "id": "c0000000-0000-0000-0000-000000000001", "name": "Electronics & Gadgets", "slug": "electronics-gadgets" },
+    { "id": "c0000000-0000-0000-0000-000000000002", "name": "AI & Robotics", "slug": "ai-robotics" },
+    { "id": "c0000000-0000-0000-0000-000000000003", "name": "Healthcare & Wellness", "slug": "healthcare-wellness" },
+    { "id": "c0000000-0000-0000-0000-000000000004", "name": "Smart Home & IoT", "slug": "smart-home-iot" },
+    { "id": "c0000000-0000-0000-0000-000000000005", "name": "EdTech & Learning Kits", "slug": "edtech-kits" },
+    { "id": "c0000000-0000-0000-0000-000000000006", "name": "Eco & Sustainability", "slug": "eco-sustainability" },
+    { "id": "c0000000-0000-0000-0000-000000000007", "name": "Developer Hardware", "slug": "developer-hardware" },
+    { "id": "c0000000-0000-0000-0000-000000000008", "name": "Cloud Subscriptions", "slug": "cloud-subscriptions" }
+  ],
+  "items": [
+    {
+      "id": "i0000000-0000-0000-0000-000000000001",
+      "title": "Quantum AI Edge Processor",
+      "description": "Ultra low-power neural compute engine for real-time edge vision inference.",
+      "price": 2499900,
+      "categoryId": "c0000000-0000-0000-0000-000000000002",
+      "stock": 45,
+      "lat": 12.9716,
+      "lng": 77.5946,
+      "images": ["https://picsum.photos/seed/edge/600/400"]
+    },
+    {
+      "id": "i0000000-0000-0000-0000-000000000002",
+      "title": "BioSense ECG Monitor",
+      "description": "Wearable 6-lead clinical grade wireless telemetry monitor.",
+      "price": 899900,
+      "categoryId": "c0000000-0000-0000-0000-000000000003",
+      "stock": 80,
+      "lat": 19.0760,
+      "lng": 72.8777,
+      "images": ["https://picsum.photos/seed/ecg/600/400"]
+    },
+    {
+      "id": "i0000000-0000-0000-0000-000000000003",
+      "title": "Solar Powered IoT Gateway",
+      "description": "Ruggedized LoRaWAN and 5G industrial gateway with integrated lithium battery.",
+      "price": 1499900,
+      "categoryId": "c0000000-0000-0000-0000-000000000004",
+      "stock": 30,
+      "lat": 28.7041,
+      "lng": 77.1025,
+      "images": ["https://picsum.photos/seed/gateway/600/400"]
+    },
+    {
+      "id": "i0000000-0000-0000-0000-000000000004",
+      "title": "AeroDrone Mapping Rig",
+      "description": "Autonomous LiDAR survey drone with centimeter-accuracy RTK GPS.",
+      "price": 8500000,
+      "categoryId": "c0000000-0000-0000-0000-000000000002",
+      "stock": 12,
+      "lat": 13.0827,
+      "lng": 80.2707,
+      "images": ["https://picsum.photos/seed/drone/600/400"]
+    },
+    {
+      "id": "i0000000-0000-0000-0000-000000000005",
+      "title": "NeuroPulse Focus Headset",
+      "description": "EEG biofeedback headband for productivity, meditation, and cognitive tracking.",
+      "price": 1799900,
+      "categoryId": "c0000000-0000-0000-0000-000000000003",
+      "stock": 65,
+      "lat": 17.3850,
+      "lng": 78.4867,
+      "images": ["https://picsum.photos/seed/eeg/600/400"]
+    }
+  ],
+  "coupons": [
+    { "code": "HACKATHON50", "type": "percent", "value": 50, "minAmount": 100000, "maxUses": 1000 },
+    { "code": "FLAT500", "type": "fixed", "value": 50000, "minAmount": 200000, "maxUses": 500 }
+  ]
+}

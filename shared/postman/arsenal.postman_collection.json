@@ -1,0 +1,58 @@
+{
+  "info": {
+    "name": "Backend Arsenal Universal Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "System Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"user@demo.com\",\n  \"password\": \"User@123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"Admin@123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "List Items",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/items?page=1&limit=10"
+      }
+    },
+    {
+      "name": "AI Generate",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/ai/generate",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Generate product taglines\"\n}"
+        }
+      }
+    }
+  ]
+}

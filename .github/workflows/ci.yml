@@ -1,0 +1,46 @@
+name: Arsenal CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          cd stacks/01-nodejs-express
+          npm install
+      - name: Run server & smoke test
+        run: |
+          cd stacks/01-nodejs-express
+          node src/server.js &
+          sleep 2
+          node ../../shared/smoke-test/smoke.mjs http://localhost:5000
+
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          cd stacks/02-python-fastapi
+          pip install -r requirements.txt
+      - name: Run server & smoke test
+        run: |
+          cd stacks/02-python-fastapi
+          python -m uvicorn app.main:app --port 5000 &
+          sleep 2
+          node ../../shared/smoke-test/smoke.mjs http://localhost:5000
