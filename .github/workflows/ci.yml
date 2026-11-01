@@ -23,7 +23,13 @@ jobs:
         run: |
           cd stacks/01-nodejs-express
           node src/server.js > node.log 2>&1 &
-          sleep 3
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:5000/api/health | grep -q "healthy"; then
+              echo "Node.js server ready!"
+              break
+            fi
+            sleep 1
+          done
           cat node.log
           node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5000
 
@@ -48,6 +54,12 @@ jobs:
         run: |
           cd stacks/02-python-fastapi
           python -m uvicorn app.main:app --host 127.0.0.1 --port 5000 > uvicorn.log 2>&1 &
-          sleep 4
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:5000/api/health | grep -q "healthy"; then
+              echo "FastAPI server ready!"
+              break
+            fi
+            sleep 1
+          done
           cat uvicorn.log
           node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5000
