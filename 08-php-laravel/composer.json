@@ -1,0 +1,14 @@
+{
+    "name": "hackathon/laravel-backend",
+    "type": "project",
+    "description": "Minimal, fast Laravel API backend template for hackathons",
+    "require": {
+        "php": "^8.2",
+        "firebase/php-jwt": "^6.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}
