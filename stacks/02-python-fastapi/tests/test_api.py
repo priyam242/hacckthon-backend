@@ -4,13 +4,6 @@ from app.main import app
 from app.database import engine, Base
 
 
-@pytest.fixture(autouse=True)
-async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-
-
 @pytest.mark.asyncio
 async def test_health_check():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
@@ -31,6 +24,9 @@ async def test_root():
 
 @pytest.mark.asyncio
 async def test_auth_and_protected_flow():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         # Signup
         signup_payload = {

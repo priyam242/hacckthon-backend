@@ -43,13 +43,13 @@ jobs:
           cd stacks/02-python-fastapi
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-      - name: Run Pytest
-        run: |
-          cd stacks/02-python-fastapi
-          PYTHONPATH=. python -m pytest -v tests/test_api.py
       - name: Run server & smoke test
         run: |
           cd stacks/02-python-fastapi
           python -m uvicorn app.main:app --host 127.0.0.1 --port 5001 &
           sleep 4
           node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5001
+      - name: Run Pytest
+        run: |
+          cd stacks/02-python-fastapi
+          PYTHONPATH=. python -m pytest tests/test_api.py
