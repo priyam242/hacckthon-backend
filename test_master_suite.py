@@ -44,18 +44,20 @@ def test_03_auth_login_customer(client):
     assert data["data"]["user"]["name"] == "Acme Global Tech"
 
 def test_04_auth_register_strict_password(client):
+    import uuid
     # Weak password test (no uppercase or special)
     res_weak = client.post("/api/auth/register", json={
         "name": "Weak User",
-        "email": "weak@example.com",
+        "email": f"weak_{uuid.uuid4().hex[:6]}@example.com",
         "password": "weakpassword"
     })
     assert res_weak.status_code == 422
 
     # Strong valid password
+    unique_email = f"strong_{uuid.uuid4().hex[:6]}@example.com"
     res_good = client.post("/api/auth/register", json={
         "name": "Strong User",
-        "email": "strong_unique@example.com",
+        "email": unique_email,
         "password": "StrongPassword@2026",
         "company_name": "Secure Corp"
     })
@@ -63,14 +65,21 @@ def test_04_auth_register_strict_password(client):
     assert res_good.json()["success"] is True
 
 def test_05_forgot_and_reset_password(client):
+    import uuid
     res_forgot = client.post("/api/auth/forgot-password", json={
         "email": "admin@brightloop.com"
     })
     assert res_forgot.status_code == 200
     assert "reset_token" in res_forgot.json()["data"]
 
+    # Register temp user to reset password
+    temp_email = f"reset_{uuid.uuid4().hex[:6]}@example.com"
+    client.post("/api/auth/register", json={
+        "name": "Reset Tester", "email": temp_email, "password": "OriginalPass@2026"
+    })
+
     res_reset = client.post("/api/auth/reset-password", json={
-        "email": "strong_unique@example.com",
+        "email": temp_email,
         "token": "simulated_token",
         "new_password": "NewStrongPass#2026"
     })
@@ -168,19 +177,21 @@ def test_12_finance_dashboard(client):
     assert metrics["response_time_ms"] < 2000  # <2s SLA
 
 def test_13_staff_management_rbac(client):
+    import uuid
     # Customer trying to create staff -> 403 Forbidden
     cust_login = client.post("/api/auth/login", json={"email": "enterprise@acme.com", "password": "Acme@2026"}).json()
     cust_token = cust_login["data"]["accessToken"]
     res_forbidden = client.post("/api/team/staff", headers={"Authorization": f"Bearer {cust_token}"}, json={
-        "name": "Rogue Staff", "email": "rogue@brightloop.com", "password": "RoguePassword@1"
+        "name": "Rogue Staff", "email": f"rogue_{uuid.uuid4().hex[:6]}@brightloop.com", "password": "RoguePassword@1"
     })
     assert res_forbidden.status_code == 403
 
     # Admin creating staff -> 201 Created
     admin_login = client.post("/api/auth/login", json={"email": "admin@brightloop.com", "password": "Brightloop@2026"}).json()
     admin_token = admin_login["data"]["accessToken"]
+    staff_email = f"alex_{uuid.uuid4().hex[:6]}@brightloop.com"
     res_allowed = client.post("/api/team/staff", headers={"Authorization": f"Bearer {admin_token}"}, json={
-        "name": "Alex Operations", "email": "alex.ops@brightloop.com", "password": "AlexStaff@2026"
+        "name": "Alex Operations", "email": staff_email, "password": "AlexStaff@2026"
     })
     assert res_allowed.status_code == 201
     assert res_allowed.json()["data"]["role"] == "staff"
