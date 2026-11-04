@@ -1,34 +1,33 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { z } from "zod";
 import { config } from "../config.js";
+import { db } from "../db.js";
 import { authenticateJwt } from "../middleware/auth.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 
 export const authRouter = Router();
 
-const users = new Map();
-
-// Seed standard admin and manager
-(async () => {
-  const adminHash = await bcrypt.hash("Admin@123", 10);
-  users.set("u001", {
-    id: "u001",
-    name: "Arjun Sharma",
-    email: "admin@demo.com",
-    username: "admin",
-    password: adminHash,
-    role: "admin",
-    createdAt: new Date().toISOString(),
-  });
-})();
+// Password rule: >8 chars, uppercase, lowercase, special character
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{9,}$/;
 
 const signupSchema = z.object({
-  name: z.string().min(2).optional(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email format"),
+  company_name: z.string().optional(),
+  password: z.string().refine(
+    (val) => passwordRegex.test(val),
+    "Password must be more than 8 characters and include at least one uppercase letter, one lowercase letter, and one special character"
+  ),
+});
+
+const staffCreateSchema = z.object({
+  name: z.string().min(2),
   email: z.string().email(),
-  username: z.string().min(3).optional(),
-  password: z.string().min(6),
+  password: z.string().refine((val) => passwordRegex.test(val), "Password does not meet complexity requirements"),
+  role: z.enum(["staff", "admin"]).default("staff"),
 });
 
 const loginSchema = z.object({
@@ -45,55 +44,41 @@ authRouter.post("/register", async (req, res, next) => {
       return sendError(
         res,
         "VALIDATION_ERROR",
-        "Request validation failed.",
+        parsed.error.issues[0]?.message || "Validation failed",
         parsed.error.issues.map((i) => ({ field: i.path.join("."), message: i.message })),
         422
       );
     }
 
-    const { email, password, name, username } = parsed.data;
-    const finalUsername = username || email.split("@")[0];
-    const finalName = name || finalUsername;
-
-    for (const u of users.values()) {
-      if (u.email.toLowerCase() === email.toLowerCase() || u.username === finalUsername) {
-        return sendError(res, "CONFLICT", "User with this email or username already exists.", [], 409);
-      }
+    const { email, password, name, company_name } = parsed.data;
+    const existing = db.prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?)").get(email);
+    if (existing) {
+      return sendError(res, "CONFLICT", "Each email can belong to only one account.", [], 409);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = "usr_" + Math.random().toString(36).substring(2, 11);
-    const newUser = {
-      id: userId,
-      name: finalName,
-      email: email.toLowerCase(),
-      username: finalUsername,
-      password: hashedPassword,
-      role: "user",
-      createdAt: new Date().toISOString(),
-    };
+    const userId = "usr_" + crypto.randomUUID().substring(0, 8);
+    const createdAt = new Date().toISOString();
 
-    users.set(userId, newUser);
+    db.prepare(`
+      INSERT INTO users (id, name, email, password_hash, role, company_name, created_at)
+      VALUES (?, ?, ?, ?, 'customer', ?, ?)
+    `).run(userId, name, email.toLowerCase(), hashedPassword, company_name || null, createdAt);
 
     const accessToken = jwt.sign(
-      { sub: newUser.id, username: newUser.username, role: newUser.role },
+      { sub: userId, email: email.toLowerCase(), role: "customer", name },
       config.jwtSecret,
       { expiresIn: config.jwtExpiresIn }
-    );
-    const refreshToken = jwt.sign(
-      { sub: newUser.id, type: "refresh" },
-      config.jwtSecret,
-      { expiresIn: "7d" }
     );
 
     return sendSuccess(
       res,
       {
-        user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
+        user: { id: userId, name, email: email.toLowerCase(), role: "customer", company_name },
         accessToken,
-        refreshToken,
+        access_token: accessToken,
       },
-      "User registered successfully",
+      "Customer account created successfully",
       null,
       201
     );
@@ -106,7 +91,7 @@ authRouter.post("/login", async (req, res, next) => {
   try {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
-      return sendError(res, "VALIDATION_ERROR", "Invalid login credentials format.", [], 422);
+      return sendError(res, "VALIDATION_ERROR", "Invalid login format", [], 422);
     }
 
     const identifier = req.body.email || req.body.username || req.body.usernameOrEmail;
@@ -116,34 +101,27 @@ authRouter.post("/login", async (req, res, next) => {
       return sendError(res, "VALIDATION_ERROR", "Email and password are required.", [], 422);
     }
 
-    let foundUser = null;
-    for (const u of users.values()) {
-      if (u.email.toLowerCase() === identifier.toLowerCase() || u.username === identifier) {
-        foundUser = u;
-        break;
-      }
-    }
-
-    if (!foundUser || !(await bcrypt.compare(password, foundUser.password))) {
+    const user = db.prepare("SELECT * FROM users WHERE LOWER(email) = LOWER(?)").get(identifier);
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
       return sendError(res, "UNAUTHORIZED", "Invalid email or password.", [], 401);
     }
 
     const accessToken = jwt.sign(
-      { sub: foundUser.id, username: foundUser.username, role: foundUser.role },
+      { sub: user.id, email: user.email, role: user.role, name: user.name },
       config.jwtSecret,
       { expiresIn: config.jwtExpiresIn }
     );
-    const refreshToken = jwt.sign(
-      { sub: foundUser.id, type: "refresh" },
-      config.jwtSecret,
-      { expiresIn: "7d" }
-    );
 
     return sendSuccess(res, {
-      user: { id: foundUser.id, name: foundUser.name, email: foundUser.email, role: foundUser.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        company_name: user.company_name,
+      },
       accessToken,
-      refreshToken,
-      access_token: accessToken, // dual compat
+      access_token: accessToken,
     }, "Authentication successful");
   } catch (error) {
     return next(error);
@@ -151,25 +129,88 @@ authRouter.post("/login", async (req, res, next) => {
 });
 
 authRouter.get("/me", authenticateJwt, (req, res) => {
-  const user = users.get(req.user.sub);
+  const user = db.prepare("SELECT id, name, email, role, company_name, created_at FROM users WHERE id = ?").get(req.user.sub);
   if (!user) {
     return sendError(res, "NOT_FOUND", "User record not found.", [], 404);
   }
+  return sendSuccess(res, user);
+});
+
+// Admin-only: add new staff member
+authRouter.post("/staff", authenticateJwt, async (req, res, next) => {
+  try {
+    if (req.user.role !== "admin") {
+      return sendError(res, "FORBIDDEN", "Only the admin can add a new member of staff.", [], 403);
+    }
+
+    const parsed = staffCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return sendError(res, "VALIDATION_ERROR", parsed.error.issues[0]?.message, [], 422);
+    }
+
+    const { email, password, name, role } = parsed.data;
+    const existing = db.prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?)").get(email);
+    if (existing) {
+      return sendError(res, "CONFLICT", "Account with this email already exists.", [], 409);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = "usr_" + crypto.randomUUID().substring(0, 8);
+    db.prepare(`
+      INSERT INTO users (id, name, email, password_hash, role, company_name, created_at)
+      VALUES (?, ?, ?, ?, ?, 'Brightloop Internal', ?)
+    `).run(userId, name, email.toLowerCase(), hashedPassword, role, new Date().toISOString());
+
+    return sendSuccess(res, { id: userId, name, email: email.toLowerCase(), role }, "Staff member added successfully", null, 201);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Forgot Password Flow
+authRouter.post("/forgot-password", (req, res) => {
+  const { email } = req.body;
+  if (!email) return sendError(res, "VALIDATION_ERROR", "Email is required.", [], 422);
+
+  const user = db.prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?)").get(email);
+  if (!user) {
+    // Return success to avoid email enumeration
+    return sendSuccess(res, { message: "If registered, a reset link has been dispatched." });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour
+
+  db.prepare(`
+    INSERT INTO password_resets (id, email, token, expires_at, used)
+    VALUES (?, ?, ?, ?, 0)
+  `).run("rst_" + crypto.randomUUID().substring(0, 8), email.toLowerCase(), resetToken, expiresAt);
 
   return sendSuccess(res, {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    username: user.username,
-    role: user.role,
-    createdAt: user.createdAt,
+    message: "Password reset link sent to your registered email.",
+    mockResetLink: `/reset-password?token=${resetToken}`,
   });
 });
 
-authRouter.post("/refresh", (req, res) => {
-  return sendSuccess(res, { accessToken: "new-token", refreshToken: "new-refresh" }, "Token refreshed");
-});
+// Reset Password
+authRouter.post("/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) {
+    return sendError(res, "VALIDATION_ERROR", "Token and new password required.", [], 422);
+  }
 
-authRouter.post("/logout", authenticateJwt, (req, res) => {
-  return sendSuccess(res, null, "Logged out successfully");
+  if (!passwordRegex.test(newPassword)) {
+    return sendError(res, "VALIDATION_ERROR", "Password must be >8 characters with uppercase, lowercase and special character.", [], 422);
+  }
+
+  const reset = db.prepare("SELECT * FROM password_resets WHERE token = ? AND used = 0").get(token);
+  if (!reset || new Date(reset.expires_at) < new Date()) {
+    return sendError(res, "INVALID_TOKEN", "Reset token is invalid or has expired.", [], 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  db.prepare("UPDATE users SET password_hash = ? WHERE LOWER(email) = LOWER(?)").run(hashedPassword, reset.email);
+  db.prepare("UPDATE password_resets SET used = 1 WHERE id = ?").run(reset.id);
+
+  return sendSuccess(res, null, "Password reset successfully. You may now log in.");
 });

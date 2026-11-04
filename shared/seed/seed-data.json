@@ -1,123 +1,187 @@
 {
+  "system": "Brightloop Software Subscription Management",
   "users": [
     {
-      "id": "u0000000-0000-0000-0000-000000000001",
-      "name": "Arjun Sharma",
-      "email": "admin@demo.com",
-      "password": "Admin@123",
+      "id": "usr_admin",
+      "name": "Admin Lead",
+      "email": "admin@brightloop.com",
+      "password": "Brightloop@2026",
       "role": "admin",
-      "isActive": true
+      "company_name": "Brightloop Software HQ"
     },
     {
-      "id": "u0000000-0000-0000-0000-000000000002",
-      "name": "Priya Patel",
-      "email": "manager@demo.com",
-      "password": "Manager@123",
-      "role": "manager",
-      "isActive": true
+      "id": "usr_staff",
+      "name": "Sara Sales Rep",
+      "email": "staff@brightloop.com",
+      "password": "Staff@2026",
+      "role": "staff",
+      "company_name": "Brightloop Sales"
     },
     {
-      "id": "u0000000-0000-0000-0000-000000000003",
-      "name": "Rohan Gupta",
-      "email": "rohan@demo.com",
-      "password": "User@123",
-      "role": "user",
-      "isActive": true
+      "id": "usr_cust_shop",
+      "name": "Corner Bakery",
+      "email": "shop@customer.com",
+      "password": "Customer@2026",
+      "role": "customer",
+      "company_name": "Corner Bakery Ltd"
     },
     {
-      "id": "u0000000-0000-0000-0000-000000000004",
-      "name": "Ananya Iyer",
-      "email": "ananya@demo.com",
-      "password": "User@123",
-      "role": "user",
-      "isActive": true
-    },
-    {
-      "id": "u0000000-0000-0000-0000-000000000005",
-      "name": "Vikram Singh",
-      "email": "vikram@demo.com",
-      "password": "User@123",
-      "role": "user",
-      "isActive": true
-    },
-    {
-      "id": "u0000000-0000-0000-0000-000000000006",
-      "name": "Sneha Reddy",
-      "email": "sneha@demo.com",
-      "password": "User@123",
-      "role": "user",
-      "isActive": true
+      "id": "usr_cust_acme",
+      "name": "Acme Global Tech",
+      "email": "enterprise@acme.com",
+      "password": "Acme@2026",
+      "role": "customer",
+      "company_name": "Acme Global Corporation"
     }
   ],
-  "categories": [
-    { "id": "c0000000-0000-0000-0000-000000000001", "name": "Electronics & Gadgets", "slug": "electronics-gadgets" },
-    { "id": "c0000000-0000-0000-0000-000000000002", "name": "AI & Robotics", "slug": "ai-robotics" },
-    { "id": "c0000000-0000-0000-0000-000000000003", "name": "Healthcare & Wellness", "slug": "healthcare-wellness" },
-    { "id": "c0000000-0000-0000-0000-000000000004", "name": "Smart Home & IoT", "slug": "smart-home-iot" },
-    { "id": "c0000000-0000-0000-0000-000000000005", "name": "EdTech & Learning Kits", "slug": "edtech-kits" },
-    { "id": "c0000000-0000-0000-0000-000000000006", "name": "Eco & Sustainability", "slug": "eco-sustainability" },
-    { "id": "c0000000-0000-0000-0000-000000000007", "name": "Developer Hardware", "slug": "developer-hardware" },
-    { "id": "c0000000-0000-0000-0000-000000000008", "name": "Cloud Subscriptions", "slug": "cloud-subscriptions" }
-  ],
-  "items": [
+  "products": [
     {
-      "id": "i0000000-0000-0000-0000-000000000001",
-      "title": "Quantum AI Edge Processor",
-      "description": "Ultra low-power neural compute engine for real-time edge vision inference.",
-      "price": 2499900,
-      "categoryId": "c0000000-0000-0000-0000-000000000002",
-      "stock": 45,
-      "lat": 12.9716,
-      "lng": 77.5946,
-      "images": ["https://picsum.photos/seed/edge/600/400"]
+      "id": "prod_erp",
+      "name": "Brightloop Core ERP",
+      "type": "software",
+      "sales_price": 1500.0,
+      "cost_price": 400.0,
+      "notes": "Comprehensive business resource planning suite",
+      "variants": [
+        { "name": "Standard Community", "extra_price": 0 },
+        { "name": "Odoo Brand Edition", "extra_price": 560 }
+      ]
     },
     {
-      "id": "i0000000-0000-0000-0000-000000000002",
-      "title": "BioSense ECG Monitor",
-      "description": "Wearable 6-lead clinical grade wireless telemetry monitor.",
-      "price": 899900,
-      "categoryId": "c0000000-0000-0000-0000-000000000003",
-      "stock": 80,
-      "lat": 19.0760,
-      "lng": 72.8777,
-      "images": ["https://picsum.photos/seed/ecg/600/400"]
+      "id": "prod_analytics",
+      "name": "Advanced Analytics Addon",
+      "type": "addon",
+      "sales_price": 350.0,
+      "cost_price": 50.0,
+      "notes": "Real-time pipeline analytics, revenue forecasting",
+      "variants": [
+        { "name": "Standard Analytics", "extra_price": 0 },
+        { "name": "Enterprise AI Insights", "extra_price": 200 }
+      ]
     },
     {
-      "id": "i0000000-0000-0000-0000-000000000003",
-      "title": "Solar Powered IoT Gateway",
-      "description": "Ruggedized LoRaWAN and 5G industrial gateway with integrated lithium battery.",
-      "price": 1499900,
-      "categoryId": "c0000000-0000-0000-0000-000000000004",
-      "stock": 30,
-      "lat": 28.7041,
-      "lng": 77.1025,
-      "images": ["https://picsum.photos/seed/gateway/600/400"]
+      "id": "prod_billing",
+      "name": "Automated Recurring Billing Engine",
+      "type": "software",
+      "sales_price": 450.0,
+      "cost_price": 90.0,
+      "notes": "Automated billing run and bank matching",
+      "variants": []
     },
     {
-      "id": "i0000000-0000-0000-0000-000000000004",
-      "title": "AeroDrone Mapping Rig",
-      "description": "Autonomous LiDAR survey drone with centimeter-accuracy RTK GPS.",
-      "price": 8500000,
-      "categoryId": "c0000000-0000-0000-0000-000000000002",
-      "stock": 12,
-      "lat": 13.0827,
-      "lng": 80.2707,
-      "images": ["https://picsum.photos/seed/drone/600/400"]
-    },
-    {
-      "id": "i0000000-0000-0000-0000-000000000005",
-      "title": "NeuroPulse Focus Headset",
-      "description": "EEG biofeedback headband for productivity, meditation, and cognitive tracking.",
-      "price": 1799900,
-      "categoryId": "c0000000-0000-0000-0000-000000000003",
-      "stock": 65,
-      "lat": 17.3850,
-      "lng": 78.4867,
-      "images": ["https://picsum.photos/seed/eeg/600/400"]
+      "id": "prod_sla",
+      "name": "24/7 Dedicated Support SLA",
+      "type": "service",
+      "sales_price": 250.0,
+      "cost_price": 50.0,
+      "notes": "15-minute response SLA",
+      "variants": []
     }
   ],
-  "coupons": [
-    { "code": "HACKATHON50", "type": "percent", "value": 50, "minAmount": 100000, "maxUses": 1000 },
-    { "code": "FLAT500", "type": "fixed", "value": 50000, "minAmount": 200000, "maxUses": 500 }
+  "plans": [
+    {
+      "id": "plan_monthly",
+      "name": "Brightloop Professional (Monthly)",
+      "cost": 99.0,
+      "billing_frequency": "monthly",
+      "min_quantity": 1,
+      "auto_close_on_end": false
+    },
+    {
+      "id": "plan_yearly",
+      "name": "Brightloop Enterprise (Yearly Contract)",
+      "cost": 999.0,
+      "billing_frequency": "yearly",
+      "min_quantity": 5,
+      "auto_close_on_end": false
+    },
+    {
+      "id": "plan_weekly",
+      "name": "Rapid Growth Sprint (Weekly)",
+      "cost": 35.0,
+      "billing_frequency": "weekly",
+      "min_quantity": 1,
+      "auto_close_on_end": true
+    },
+    {
+      "id": "plan_daily",
+      "name": "Sandbox Pilot Pass (Daily)",
+      "cost": 10.0,
+      "billing_frequency": "daily",
+      "min_quantity": 1,
+      "auto_close_on_end": true
+    }
+  ],
+  "discounts": [
+    {
+      "id": "disc_seats",
+      "name": "Multi-Seat High Volume (15% Off)",
+      "code": "SEATS15",
+      "type": "percentage",
+      "value": 15.0,
+      "min_purchase": 0,
+      "min_quantity": 5,
+      "scope": "whole_subscription"
+    },
+    {
+      "id": "disc_fixed",
+      "name": "Early Adopter Welcome Voucher ($50 Off)",
+      "code": "WELCOME50",
+      "type": "fixed",
+      "value": 50.0,
+      "min_purchase": 200.0,
+      "min_quantity": 1,
+      "scope": "whole_subscription"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_001",
+      "sub_number": "SUB-2026-0001",
+      "customer_id": "usr_cust_acme",
+      "plan_id": "plan_yearly",
+      "status": "Active",
+      "payment_terms": "net_30"
+    },
+    {
+      "id": "sub_002",
+      "sub_number": "SUB-2026-0002",
+      "customer_id": "usr_cust_shop",
+      "plan_id": "plan_monthly",
+      "status": "Active",
+      "payment_terms": "net_15"
+    },
+    {
+      "id": "sub_003",
+      "sub_number": "SUB-2026-0003",
+      "customer_id": "usr_cust_shop",
+      "plan_id": "plan_monthly",
+      "status": "Quotation",
+      "payment_terms": "net_15"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_001",
+      "invoice_number": "INV-2026-0001",
+      "customer_id": "usr_cust_acme",
+      "status": "Paid",
+      "total_amount": 13089.15
+    },
+    {
+      "id": "inv_002",
+      "invoice_number": "INV-2026-0002",
+      "customer_id": "usr_cust_shop",
+      "status": "Confirmed",
+      "total_amount": 1770.0,
+      "is_overdue": true
+    },
+    {
+      "id": "inv_003",
+      "invoice_number": "INV-2026-0003",
+      "customer_id": "usr_cust_shop",
+      "status": "Draft",
+      "total_amount": 531.0
+    }
   ]
 }

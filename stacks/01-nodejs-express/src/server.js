@@ -3,11 +3,23 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import crypto from "crypto";
 import { config } from "./config.js";
+import { initDatabase } from "./db.js";
 import { authRouter } from "./routes/auth.js";
-import { itemsRouter } from "./routes/items.js";
-import { aiRouter } from "./routes/ai.js";
+import { productsRouter } from "./routes/products.js";
+import { plansRouter } from "./routes/plans.js";
+import { quotationsRouter } from "./routes/quotations.js";
+import { subscriptionsRouter } from "./routes/subscriptions.js";
+import { billingRouter } from "./routes/billing.js";
+import { invoicesRouter } from "./routes/invoices.js";
+import { discountsRouter } from "./routes/discounts.js";
+import { paymentsRouter } from "./routes/payments.js";
+import { financeRouter } from "./routes/finance.js";
+import { taxesRouter } from "./routes/taxes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { sendSuccess, sendError } from "./utils/response.js";
+
+// Initialize SQLite database schema and seed data
+initDatabase();
 
 const app = express();
 
@@ -39,7 +51,8 @@ app.use(limiter);
 const handleHealth = (req, res) => {
   sendSuccess(res, {
     status: "healthy",
-    service: "hackathon-nodejs-express-backend",
+    system: "Brightloop Subscription Management Platform",
+    service: "brightloop-subscription-backend",
     environment: config.nodeEnv,
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
@@ -53,7 +66,7 @@ app.get("/api/health/ready", (req, res) => res.status(200).send("READY"));
 
 app.get("/", (req, res) => {
   sendSuccess(res, {
-    message: "Backend Arsenal Reference Stack (Node.js Express) is running!",
+    message: "Brightloop Subscription Management System API (Node.js Express) is live!",
     health: "/api/health",
     docs: "/api/docs",
   });
@@ -61,17 +74,31 @@ app.get("/", (req, res) => {
 
 app.get("/api/docs", (req, res) => {
   res.send(`
+    <!DOCTYPE html>
     <html>
-      <head><title>Backend Arsenal API Docs</title></head>
-      <body style="font-family:sans-serif;padding:2rem;">
-        <h1>⚡ Backend Arsenal Swagger API Documentation</h1>
-        <p>Conforming to the Universal API Contract.</p>
+      <head>
+        <title>Brightloop Subscription Management API Docs</title>
+        <style>body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:1rem;color:#1e293b;} h1{color:#0f172a;} code{background:#f1f5f9;padding:2px 6px;border-radius:4px;}</style>
+      </head>
+      <body>
+        <h1>Brightloop Subscription Management System — API Specification</h1>
+        <p>Unified REST endpoints for subscriptions, recurring billing, quotations, invoicing, payments and finance intelligence.</p>
         <ul>
-          <li><a href="/api/health">GET /api/health</a></li>
-          <li>POST /api/auth/register</li>
-          <li>POST /api/auth/login</li>
-          <li>GET /api/items</li>
-          <li>POST /api/ai/generate</li>
+          <li><code>POST /api/auth/register</code> - Customer Sign Up (>8 chars password validation)</li>
+          <li><code>POST /api/auth/login</code> - JWT Auth (Admin, Staff, Customer)</li>
+          <li><code>POST /api/auth/staff</code> - Admin adds staff</li>
+          <li><code>POST /api/auth/forgot-password</code> - Reset link</li>
+          <li><code>GET /api/products</code> - Products & Variants</li>
+          <li><code>GET /api/plans</code> - Billing plans (daily, weekly, monthly, yearly)</li>
+          <li><code>GET /api/quotations/templates</code> - Quotation templates</li>
+          <li><code>POST /api/quotations/:id/convert</code> - Quote to Subscription pipeline</li>
+          <li><code>GET /api/subscriptions</code> - Lifecycle tracking (Draft -> Quotation -> Confirmed -> Active -> Closed)</li>
+          <li><code>POST /api/billing/run</code> - Automated Billing Day Invoice Run (Taxes, Discounts, Idempotent)</li>
+          <li><code>GET /api/invoices</code> - Invoices list & details</li>
+          <li><code>GET /api/invoices/:id/print</code> - Formatted printable invoice</li>
+          <li><code>POST /api/payments</code> - Record payments & auto-reconcile</li>
+          <li><code>GET /api/discounts</code> - Admin discount rules (Fixed/Percentage, min qty/amount)</li>
+          <li><code>GET /api/finance/dashboard</code> - Finance lead dashboard (&lt; 2s response)</li>
         </ul>
       </body>
     </html>
@@ -80,12 +107,20 @@ app.get("/api/docs", (req, res) => {
 
 // Mount Routes
 app.use("/api/auth", authRouter);
-app.use("/api/items", itemsRouter);
-app.use("/api/ai", aiRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/plans", plansRouter);
+app.use("/api/quotations", quotationsRouter);
+app.use("/api/subscriptions", subscriptionsRouter);
+app.use("/api/billing", billingRouter);
+app.use("/api/invoices", invoicesRouter);
+app.use("/api/discounts", discountsRouter);
+app.use("/api/payments", paymentsRouter);
+app.use("/api/finance", financeRouter);
+app.use("/api/taxes", taxesRouter);
 
-// Catch-all 404 handler in universal error envelope
+// Catch-all 404 handler
 app.use((req, res) => {
-  sendError(res, "NOT_FOUND", `The endpoint ${req.method} ${req.originalUrl} does not exist.`, [], 404);
+  sendError(res, "NOT_FOUND", `Endpoint ${req.method} ${req.originalUrl} not found.`, [], 404);
 });
 
 // Global Error Handler
@@ -93,7 +128,7 @@ app.use(errorHandler);
 
 if (process.env.NODE_ENV !== "test") {
   app.listen(config.port, () => {
-    console.log(`[Backend Arsenal Node.js] Listening at http://localhost:${config.port}`);
+    console.log(`[Brightloop Subscription Engine] Running at http://localhost:${config.port}`);
   });
 }
 
