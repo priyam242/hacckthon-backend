@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Install dependencies
         run: |
           cd stacks/01-nodejs-express
@@ -44,7 +44,7 @@ jobs:
       - name: Setup Node.js for smoke runner
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Install dependencies
         run: |
           cd stacks/02-python-fastapi
@@ -75,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install fastapi uvicorn "pydantic>=2.0" sqlalchemy aiosqlite pyjwt bcrypt pytest httpx
+          python -m pip install fastapi uvicorn "pydantic[email]>=2.0" email-validator sqlalchemy aiosqlite pyjwt bcrypt pytest httpx
       - name: Run Master Pytest Suite
         run: |
           pytest test_master_suite.py
