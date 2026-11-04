@@ -77,7 +77,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install fastapi uvicorn "pydantic[email]>=2.0" email-validator sqlalchemy aiosqlite pyjwt bcrypt pytest pytest-asyncio anyio httpx
+          python -m pip install -r stacks/02-python-fastapi/requirements.txt
       - name: Run Master Pytest Suite
         run: |
           python -m pytest -v test_master_suite.py
