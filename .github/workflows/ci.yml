@@ -66,6 +66,8 @@ jobs:
 
   test-master-python:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -75,7 +77,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install fastapi uvicorn "pydantic[email]>=2.0" email-validator sqlalchemy aiosqlite pyjwt bcrypt pytest httpx
+          python -m pip install fastapi uvicorn "pydantic[email]>=2.0" email-validator sqlalchemy aiosqlite pyjwt bcrypt pytest pytest-asyncio anyio httpx
       - name: Run Master Pytest Suite
         run: |
-          pytest test_master_suite.py
+          python -m pytest -v test_master_suite.py
