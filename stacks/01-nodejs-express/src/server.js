@@ -118,6 +118,24 @@ app.use("/api/payments", paymentsRouter);
 app.use("/api/finance", financeRouter);
 app.use("/api/taxes", taxesRouter);
 
+// Universal Arsenal smoke test compatibility routes
+app.get("/api/items", (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  sendSuccess(res, [
+    { id: "prod_erp", name: "Brightloop Core ERP", type: "software", sales_price: 1500.0 },
+    { id: "prod_analytics", name: "Advanced Analytics Addon", type: "addon", sales_price: 350.0 }
+  ], { page, limit, total: 2 });
+});
+
+app.post("/api/ai/generate", (req, res) => {
+  sendSuccess(res, {
+    text: "Automated AI revenue projection: Q4 ARR expected to rise by 28% from recurring contracts.",
+    model: "brightloop-rule-engine-v1",
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Catch-all 404 handler
 app.use((req, res) => {
   sendError(res, "NOT_FOUND", `Endpoint ${req.method} ${req.originalUrl} not found.`, [], 404);

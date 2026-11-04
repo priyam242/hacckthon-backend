@@ -63,3 +63,19 @@ jobs:
           done
           cat uvicorn.log
           node ../../shared/smoke-test/smoke.mjs http://127.0.0.1:5000
+
+  test-master-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install fastapi uvicorn "pydantic>=2.0" sqlalchemy aiosqlite pyjwt bcrypt pytest httpx
+      - name: Run Master Pytest Suite
+        run: |
+          pytest test_master_suite.py

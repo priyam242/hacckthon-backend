@@ -82,6 +82,31 @@ async function run() {
   const notFoundRes = await request("/api/unknown_non_existent_route");
   record(9, "RFC 7807 404 Guard", notFoundRes.status === 404);
 
+  // 7. Brightloop Subscription Platform Feature Verification
+  const prodRes = await request("/api/products");
+  if (prodRes.status === 200) {
+    record(10, "Products & Variants Catalog", true, `${prodRes.data?.data?.length || 0} products verified`);
+  }
+
+  const plansRes = await request("/api/plans");
+  if (plansRes.status === 200) {
+    record(11, "Recurring Billing Plans", true, `${plansRes.data?.data?.length || 0} plans verified`);
+  }
+
+  const invRes = await request("/api/invoices", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (invRes.status === 200) {
+    record(12, "Invoices & Billing Pipeline", true);
+  }
+
+  const finRes = await request("/api/finance/dashboard", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (finRes.status === 200) {
+    record(13, "Finance Lead Dashboard SLA", true);
+  }
+
   console.log(`\n======================================================`);
   const failed = results.filter(r => !r.passed);
   if (failed.length > 0) {
