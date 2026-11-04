@@ -7,13 +7,10 @@ from fastapi.testclient import TestClient
 from main import app, init_and_seed_db
 import asyncio
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_db():
-    asyncio.run(init_and_seed_db())
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
-    return TestClient(app)
+    with TestClient(app) as c:
+        yield c
 
 def test_01_health_check(client):
     res = client.get("/api/health")
